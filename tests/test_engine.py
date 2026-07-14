@@ -8,16 +8,18 @@ diverse domains equally.
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(__file__))
 
-import engine
-import inference as inf
-from tokenizer import tokenize, tokenize_with_polarity, get_polarity
-from extractor import extract_causal_pairs, extract_from_texts
+# Ensure src/ is on the path so vela_causal package is importable
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-PASS = "✅"
-FAIL = "❌"
-SEP  = "─" * 55
+from vela_causal import engine
+from vela_causal import inference as inf
+from vela_causal.tokenizer import tokenize, tokenize_with_polarity, get_polarity
+from vela_causal.extractor import extract_causal_pairs, extract_from_texts
+
+PASS = "PASS"
+FAIL = "FAIL"
+SEP  = "-" * 55
 
 def section(title):
     print(f"\n{'='*55}")
@@ -39,8 +41,8 @@ tests = [
     ("oil supply decrease",   ["oil_supply_decrease"]),
     ("price increase",        ["price_increase"]),
     ("employment levels decrease", ["employment_levels_decrease"]),
-    ("heavy rain",            []),   # no direction → empty
-    ("unemployment",          []),   # bare noun → empty
+    ("heavy rain",            []),   # no direction -> empty
+    ("unemployment",          []),   # bare noun -> empty
     ("interest rate rise",    ["interest_rate_increase"]),
 ]
 
@@ -144,7 +146,7 @@ check("Graph is not empty", len(graph) > 0)
 if "company_profit_decrease" in graph:
     neighbors = [n for n, s, p in graph["company_profit_decrease"]]
     check(
-        "company_profit_decrease → employment_levels_decrease",
+        "company_profit_decrease -> employment_levels_decrease",
         "employment_levels_decrease" in neighbors,
         f"neighbors: {neighbors}"
     )
@@ -152,11 +154,11 @@ else:
     check("company_profit_decrease in graph", False, "key missing from graph")
 
 # Verify no unexpected reversal edges (bidirectional check)
-# If A→B was trained, B should NOT auto-appear as B→A
+# If A->B was trained, B should NOT auto-appear as B->A
 if "employment_levels_decrease" in graph:
     reverse_neighbors = [n for n, s, p in graph["employment_levels_decrease"]]
     check(
-        "No auto-reverse edge employment → company_profit",
+        "No auto-reverse edge employment -> company_profit",
         "company_profit_decrease" not in reverse_neighbors,
         f"reverse neighbors: {reverse_neighbors}"
     )
@@ -259,7 +261,7 @@ engine.delete_model(MODEL_B)
 # ------------------------------------------------------------------
 # SUMMARY
 # ------------------------------------------------------------------
-section("✅ Test complete")
+section("Test complete")
 print("  Run with Ollama enabled: python repl.py")
 print("  Start API server: uvicorn api:app --reload --port 8000")
 print()

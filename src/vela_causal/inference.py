@@ -12,9 +12,10 @@ Beam-search causal inference with:
 """
 
 import math
-from typing import List, Dict, Tuple, Optional
-from tokenizer import get_polarity, tokenize
-from llm_normalizer import normalize_query
+from typing import List, Dict
+
+from .tokenizer import get_polarity, tokenize
+from .llm_normalizer import normalize_query
 
 # ------------------------------------------------------------------
 # BEAM SEARCH INFERENCE

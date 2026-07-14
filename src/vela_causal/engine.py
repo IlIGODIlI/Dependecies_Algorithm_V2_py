@@ -12,21 +12,25 @@ Directed causal graph engine.
 
 import os
 import json
-import math
-from collections import defaultdict
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict
 
-from tokenizer import get_polarity
-from extractor import extract_from_texts
-from llm_normalizer import normalize_texts, normalize_query
+from .tokenizer import get_polarity
+from .extractor import extract_from_texts
+from .llm_normalizer import normalize_texts
+
+# ------------------------------------------------------------------
+# CONFIG (with Environment Variable Overrides)
+# ------------------------------------------------------------------
+
+MODELS_DIR = os.getenv("VELA_MODELS_DIR", "models")
+os.makedirs(MODELS_DIR, exist_ok=True)
+
+# Minimum strength threshold — edges below this are pruned on query
+MIN_STRENGTH = float(os.getenv("VELA_MIN_STRENGTH", "0.05"))
 
 # ------------------------------------------------------------------
 # PERSISTENCE
 # ------------------------------------------------------------------
-
-MODELS_DIR = "models"
-os.makedirs(MODELS_DIR, exist_ok=True)
-
 
 def _model_path(model_id: str) -> str:
     safe_id = "".join(c for c in model_id if c.isalnum() or c in "_-")
@@ -61,10 +65,12 @@ def load_model(model_id: str) -> dict:
 
 def list_models() -> List[dict]:
     models = []
+    if not os.path.exists(MODELS_DIR):
+        return models
     for fname in os.listdir(MODELS_DIR):
         if fname.endswith(".json"):
             try:
-                with open(os.path.join(MODELS_DIR, fname)) as f:
+                with open(os.path.join(MODELS_DIR, fname), "r", encoding="utf-8") as f:
                     data = json.load(f)
                     models.append({
                         "model_id":    data.get("model_id", fname[:-5]),
@@ -89,9 +95,6 @@ def delete_model(model_id: str) -> bool:
 # ------------------------------------------------------------------
 # TRAINING
 # ------------------------------------------------------------------
-
-# Minimum strength threshold — edges below this are pruned on query
-MIN_STRENGTH = 0.05
 
 def train(
     model_id: str,

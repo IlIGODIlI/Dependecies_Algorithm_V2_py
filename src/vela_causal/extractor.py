@@ -8,8 +8,8 @@ not inferred from word proximity.
 """
 
 import re
-from typing import List, Tuple, Optional
-from tokenizer import tokenize_with_polarity, get_polarity
+from typing import List, Tuple
+from .tokenizer import tokenize_with_polarity
 
 # ------------------------------------------------------------------
 # CAUSAL CONNECTORS (order matters — check longer ones first)

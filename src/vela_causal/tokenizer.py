@@ -7,8 +7,9 @@ from building co-occurrence edges on bare nouns (which caused the
 oil/price domain bias in the original engine).
 """
 
+import os
 import re
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 # ------------------------------------------------------------------
 # DIRECTION VOCABULARY
@@ -86,7 +87,7 @@ STOPWORDS = {
 }
 
 # Max entity words before the direction word (e.g. "oil supply" = 2 words)
-MAX_ENTITY_WORDS = 4
+MAX_ENTITY_WORDS = int(os.getenv("VELA_MAX_ENTITY_WORDS", "4"))
 
 
 # ------------------------------------------------------------------

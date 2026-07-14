@@ -15,18 +15,19 @@ Ollama endpoint (local): http://localhost:11434
 """
 
 import json
+import os
 import urllib.request
 import urllib.error
 from typing import List, Optional
 
 # ------------------------------------------------------------------
-# CONFIG
+# CONFIG (with Environment Variable Overrides)
 # ------------------------------------------------------------------
 
-OLLAMA_URL   = "http://localhost:11434/api/generate"
-OLLAMA_CHAT  = "http://localhost:11434/api/chat"
-DEFAULT_MODEL = "llama3"          # change to any pulled model: mistral, phi3, gemma2, etc.
-TIMEOUT       = 30                # seconds
+OLLAMA_URL    = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
+OLLAMA_CHAT   = os.getenv("OLLAMA_CHAT", "http://localhost:11434/api/chat")
+DEFAULT_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
+TIMEOUT       = int(os.getenv("OLLAMA_TIMEOUT", "30"))
 
 # ------------------------------------------------------------------
 # SYSTEM PROMPT — the key to bias removal
